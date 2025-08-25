@@ -192,6 +192,24 @@ Intelligently processes video with optimal strategy selection (passthrough, rewr
 - iOS 11.0+
 - Android API Level 21+
 
+## Testing
+
+Before using in production, test the library with real video files:
+
+```bash
+# Create test video files (requires FFmpeg)
+./scripts/create-test-videos.sh
+
+# Run example app for interactive testing
+yarn example:ios     # iOS
+yarn example:android # Android
+
+# Run unit tests
+yarn test
+```
+
+See [TESTING.md](TESTING.md) for comprehensive testing guide.
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.

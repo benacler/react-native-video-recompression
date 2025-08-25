@@ -36,8 +36,12 @@
         "build:types": "tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir lib/typescript",
         "clean": "rimraf lib",
         "example": "yarn --cwd example",
+        "example:ios": "yarn example && cd example && yarn ios",
+        "example:android": "yarn example && cd example && yarn android",
+        "test:example": "yarn example && cd example && yarn install && yarn typescript",
         "pods": "cd example && pod-install --quiet",
         "bootstrap": "yarn example && yarn && yarn pods",
+        "create-test-videos": "./scripts/create-test-videos.sh",
         "release": "semantic-release"
     },
     "keywords": [

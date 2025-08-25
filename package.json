@@ -76,6 +76,7 @@
         "registry": "https://registry.npmjs.org/"
     },
     "devDependencies": {
+        "@babel/preset-typescript": "^7.27.1",
         "@commitlint/config-conventional": "^18.4.3",
         "@react-native-community/eslint-config": "^3.2.0",
         "@semantic-release/changelog": "^6.0.3",
@@ -87,8 +88,8 @@
         "@types/jest": "^29.5.8",
         "@types/react": "^18.2.38",
         "@types/react-native": "0.72.7",
-        "@typescript-eslint/eslint-plugin": "^6.13.1",
-        "@typescript-eslint/parser": "^6.13.1",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "@typescript-eslint/parser": "^6.21.0",
         "commitlint": "^18.4.3",
         "eslint": "^8.54.0",
         "eslint-config-prettier": "^9.0.0",
@@ -111,6 +112,5 @@
     "engines": {
         "node": ">= 18.0.0",
         "npm": ">= 8.0.0"
-    },
-    "packageManager": "yarn@3.6.4"
+    }
 }

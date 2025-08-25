@@ -31,3 +31,21 @@ yarn-error.log*
 # Temporary files
 *.tmp
 *.temp
+
+# Video test files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.m4v
+*.3gp
+*.flv
+*.wmv
+test-videos/
+example/assets/*.mp4
+example/assets/*.mov
+example/assets/*.avi
+example/assets/*.mkv
+example/assets/*.webm
+example/assets/*.m4v

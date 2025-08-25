@@ -1,0 +1,12 @@
+# Android build artifacts
+/build/
+/.cxx/
+/local.properties
+
+# Generated files
+*.class
+*.dex
+*.ap_
+
+# Log Files
+*.log

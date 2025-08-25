@@ -1,0 +1,73 @@
+# Source and development files
+src/
+example/
+__tests__/
+*.spec.ts
+*.spec.tsx
+*.test.ts
+*.test.tsx
+
+# Build tools and configuration
+tsconfig.json
+tsconfig.build.json
+.eslintrc.json
+.prettierrc.json
+jest.config.js
+jest.setup.js
+.babelrc
+.gitignore
+.editorconfig
+
+# Documentation not needed for npm
+CONTRIBUTING.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+PUBLISHING_GUIDE.md
+
+# GitHub specific
+.github/
+.git/
+
+# Development dependencies
+node_modules/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage and test artifacts
+coverage/
+.nyc_output/
+junit.xml
+
+# Temporary files
+*.tmp
+*.temp
+
+# Android build artifacts (keep source)
+android/build/
+android/.cxx/
+android/local.properties
+android/gradle.properties
+android/.gradle/
+
+# iOS build artifacts
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+ios/*.xcuserdata
+
+# Build outputs that should be included
+!lib/

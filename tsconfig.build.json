@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "example",
+    "**/__tests__/**",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
+}

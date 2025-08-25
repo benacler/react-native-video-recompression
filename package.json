@@ -42,6 +42,9 @@
         "pods": "cd example && pod-install --quiet",
         "bootstrap": "yarn example && yarn && yarn pods",
         "create-test-videos": "./scripts/create-test-videos.sh",
+        "setup-example": "./scripts/setup-example.sh",
+        "validate": "./scripts/validate-library.sh",
+        "pre-publish": "./scripts/pre-publish.sh",
         "release": "semantic-release"
     },
     "keywords": [

@@ -7,23 +7,50 @@
 
 A React Native library for intelligent video processing with native performance. Supports video analysis, quality-preserving format conversion, and smart recompression with customizable settings.
 
-## Installation
+## 🚀 Quick Start
 
-```sh
+### Installation
+
+```bash
 npm install react-native-video-recompression
+# or
+yarn add react-native-video-recompression
 ```
 
-### iOS
+### iOS Setup
 
-Run `pod install` in the iOS directory:
-
-```sh
+```bash
 cd ios && pod install
 ```
 
-### Android
+### Android Setup
 
-No additional setup required. The package will be auto-linked.
+No additional setup required - auto-linking handles everything!
+
+## 📱 Testing with Example App
+
+We provide a complete example app to test all functionality:
+
+```bash
+# 1. Generate the React Native example app
+./scripts/setup-example.sh
+
+# 2. Navigate to example directory  
+cd example
+
+# 3. Run on iOS
+npm run ios
+
+# 4. Run on Android
+npm run android
+```
+
+The example app includes:
+- Interactive testing interface
+- All API methods demonstrated
+- Progress tracking
+- Error handling examples
+- Performance metrics
 
 ## Usage
 

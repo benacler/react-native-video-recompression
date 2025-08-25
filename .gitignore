@@ -43,23 +43,3 @@ yarn-error.log*
 *.flv
 *.wmv
 test-videos/
-example/assets/*.mp4
-example/assets/*.mov
-example/assets/*.avi
-example/assets/*.mkv
-example/assets/*.webm
-example/assets/*.m4v
-
-# Generated React Native example app files
-example/ios/
-example/android/
-example/node_modules/
-example/.bundle/
-example/metro.config.js
-example/babel.config.js
-example/tsconfig.json
-example/.watchmanconfig
-example/Gemfile*
-example/vendor/
-example/.ruby-version
-example/__tests__/

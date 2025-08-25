@@ -85,13 +85,13 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 ## Project Structure
 
 ```
-├── src/                 # TypeScript source code
 ├── android/             # Android native implementation
-├── ios/                 # iOS native implementation
-├── example/             # Example React Native app
-├── __tests__/           # Test files
-├── .github/workflows/   # CI/CD workflows
-└── docs/               # Documentation
+├── ios/                 # iOS native implementation  
+├── src/                 # TypeScript source code
+├── lib/                 # Built library output
+├── scripts/             # Utility scripts
+├── docs/                # Documentation
+└── __tests__/           # Test files
 ```
 
 ## Native Development
@@ -115,7 +115,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 - Unit tests: Jest
 - Native testing: Platform-specific test frameworks
-- Integration testing: Example app
+- Integration testing: Manual with real React Native apps
 
 Run tests with:
 ```bash
@@ -130,7 +130,7 @@ When adding new features or changing existing functionality:
 
 1. Update the README.md
 2. Update API documentation in code comments
-3. Add examples to the example app
+3. Add usage examples to documentation
 4. Update CHANGELOG.md
 
 ## Release Process

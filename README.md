@@ -27,30 +27,39 @@ cd ios && pod install
 
 No additional setup required - auto-linking handles everything!
 
-## 📱 Testing with Example App
+## 🧪 Testing
 
-We provide a complete example app to test all functionality:
+### Unit Tests
+```bash
+npm test
+```
+
+### Build Validation  
+```bash
+npm run build
+npm run validate
+```
+
+### Integration Testing
+Create a new React Native app and install the library:
 
 ```bash
-# 1. Generate the React Native example app
-./scripts/setup-example.sh
+# Create new RN app
+npx react-native@0.72.7 init VideoTestApp
 
-# 2. Navigate to example directory  
-cd example
+# Install the library
+cd VideoTestApp
+npm install react-native-video-recompression
 
-# 3. Run on iOS
+# iOS setup
+cd ios && pod install && cd ..
+
+# Test on devices
 npm run ios
-
-# 4. Run on Android
 npm run android
 ```
 
-The example app includes:
-- Interactive testing interface
-- All API methods demonstrated
-- Progress tracking
-- Error handling examples
-- Performance metrics
+For detailed testing instructions, see [TESTING.md](TESTING.md).
 
 ## Usage
 

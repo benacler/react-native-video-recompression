@@ -14,55 +14,38 @@ yarn test
 
 ### 2. **Integration Tests** (Manual)
 - Real video file processing
-- Native module functionality
+- Native module functionality  
 - Cross-platform compatibility
 
-### 3. **Example App Testing** (Recommended)
-- Interactive testing with real videos
-- All API methods validation
-- Progress callback testing
+### 3. **Device Testing** (Required)
+- Create your own React Native app
+- Install library and test on real devices
+- Complete functionality validation
 
 ## 🚀 Quick Start Testing
 
 ### Prerequisites
 - React Native development environment set up
 - iOS Simulator or Android Emulator/Device
-- Test video files (see `example/assets/README.md`)
 
-### Option 1: Example App (Recommended)
-
-```bash
-# 1. Navigate to example directory
-cd example
-
-# 2. Install dependencies
-yarn install
-
-# 3. Install iOS dependencies (iOS only)
-cd ios && pod install && cd ..
-
-# 4. Run on iOS
-yarn ios
-
-# 5. Run on Android
-yarn android
-```
-
-### Option 2: Create Your Own Test App
+### Create Your Own Test App
 
 ```bash
 # 1. Create new RN app
-npx react-native@latest init VideoTest
+npx react-native@0.72.7 init VideoTest
 
 # 2. Install the library
-cd VideoTest
-yarn add file:../react-native-video-recompression
+cd VideoTest  
+npm install react-native-video-recompression
 
-# 3. Link native dependencies
-cd ios && pod install && cd .. # iOS
-# Android auto-links
+# 3. iOS setup (if needed)
+cd ios && pod install && cd ..
 
-# 4. Import and test in your app
+# 4. Run on iOS
+npm run ios
+
+# 5. Run on Android  
+npm run android
 ```
 
 ## 📱 Manual Testing Checklist
@@ -172,13 +155,11 @@ Performance Metrics:
 
 Before publishing to npm:
 
-- [ ] All unit tests pass (`yarn test`)
-- [ ] TypeScript compilation works (`yarn typecheck`)
-- [ ] Linting passes (`yarn lint`)
-- [ ] Example app builds and runs on iOS
-- [ ] Example app builds and runs on Android
-- [ ] Manual testing completed with various video formats
-- [ ] Performance testing completed
+- [ ] All unit tests pass (`npm test`)
+- [ ] TypeScript compilation works (`npm run build`)
+- [ ] Linting passes (`npm run lint`)
+- [ ] Manual testing completed with real React Native app
+- [ ] Performance testing completed on actual devices
 - [ ] Error handling verified
 - [ ] Documentation updated
 - [ ] Version number updated

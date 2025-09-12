@@ -26,7 +26,7 @@ RCT_EXPORT_METHOD(init:(RCTPromiseResolveBlock)resolve
         RCTLogInfo(@"VideoRecompression module initialized successfully on iOS");
         resolve(@{
             @"platform": @"ios",
-            @"version": @"2.0.0",
+            @"version": @"0.9.1",
             @"capabilities": @[@"video_analysis", @"smart_compression", @"codec_detection", @"container_rewrap", @"progress_callbacks"]
         });
     });
@@ -71,13 +71,34 @@ RCT_EXPORT_METHOD(analyzeVideo:(NSString *)filePath
             CGSize videoSize = videoTrack.naturalSize;
             float frameRate = videoTrack.nominalFrameRate;
             
-            // Estimate bitrates (more accurate methods would require deeper analysis)
+            // Get accurate bitrates from track metadata
             long long videoBitrate = 0;
             long long audioBitrate = 0;
             
-            if (durationSeconds > 0) {
-                videoBitrate = (long long)((fileSize * 8.0 / durationSeconds) * 0.85); // Estimate 85% for video
-                audioBitrate = (long long)((fileSize * 8.0 / durationSeconds) * 0.15); // Estimate 15% for audio
+            // Try to get actual video bitrate from track
+            if (videoTrack) {
+                // Try estimatedDataRate first (most accurate)
+                if (videoTrack.estimatedDataRate > 0) {
+                    videoBitrate = (long long)videoTrack.estimatedDataRate;
+                } else {
+                    // Fallback: calculate from file size if duration available
+                    if (durationSeconds > 0) {
+                        videoBitrate = (long long)((fileSize * 8.0 / durationSeconds) * 0.85); // Estimate 85% for video
+                    }
+                }
+            }
+            
+            // Try to get actual audio bitrate from track
+            if (audioTrack) {
+                // Try estimatedDataRate first (most accurate)
+                if (audioTrack.estimatedDataRate > 0) {
+                    audioBitrate = (long long)audioTrack.estimatedDataRate;
+                } else {
+                    // Fallback: use common defaults based on codec
+                    audioBitrate = 128000; // 128 kbps default for AAC
+                }
+            } else {
+                audioBitrate = 0; // No audio track
             }
             
             // Get format descriptions to detect codecs
@@ -99,6 +120,12 @@ RCT_EXPORT_METHOD(analyzeVideo:(NSString *)filePath
                     case kCMVideoCodecType_VP9:
                         videoCodec = @"vp9";
                         break;
+                    case 'vp08': // VP8 codec type
+                        videoCodec = @"vp8";
+                        break;
+                    case 'av01': // AV1 codec type
+                        videoCodec = @"av1";
+                        break;
                     default:
                         videoCodec = [NSString stringWithFormat:@"unknown_%u", codecType];
                         break;
@@ -118,6 +145,15 @@ RCT_EXPORT_METHOD(analyzeVideo:(NSString *)filePath
                         break;
                     case kAudioFormatLinearPCM:
                         audioCodec = @"pcm";
+                        break;
+                    case kAudioFormatOpus:
+                        audioCodec = @"opus";
+                        break;
+                    case 'vorb': // Vorbis codec type
+                        audioCodec = @"vorbis";
+                        break;
+                    case kAudioFormatFLAC:
+                        audioCodec = @"flac";
                         break;
                     default:
                         audioCodec = [NSString stringWithFormat:@"unknown_%u", codecType];
@@ -233,16 +269,42 @@ RCT_EXPORT_METHOD(processVideo:(NSString *)inputPath
     NSString *targetAudioCodec = settings[@"audioCodec"] ?: @"aac";
     NSString *targetContainer = @"mp4";
     
+    // Get current bitrates for smart decision making
+    long long currentVideoBitrate = 0;
+    long long currentAudioBitrate = 0;
+    
+    if (videoTrack && videoTrack.estimatedDataRate > 0) {
+        currentVideoBitrate = (long long)videoTrack.estimatedDataRate;
+    }
+    if (audioTrack && audioTrack.estimatedDataRate > 0) {
+        currentAudioBitrate = (long long)audioTrack.estimatedDataRate;
+    }
+    
+    // Define thresholds for chat optimization (matching Android implementation)
+    long long videoRecompressionThreshold = 2000000; // 2 Mbps
+    long long audioRecompressionThreshold = 192000;  // 192 kbps
+    
+    // Check if bitrates are reasonable for chat
+    BOOL videoBitrateReasonable = currentVideoBitrate <= videoRecompressionThreshold || currentVideoBitrate == 0;
+    BOOL audioBitrateReasonable = currentAudioBitrate <= audioRecompressionThreshold || currentAudioBitrate == 0;
+    BOOL codecsMatch = [currentVideoCodec isEqualToString:targetVideoCodec] && [currentAudioCodec isEqualToString:targetAudioCodec];
+    BOOL containerMatches = [inputContainer isEqualToString:targetContainer];
+    
+    RCTLogInfo(@"Smart processing decision factors:");
+    RCTLogInfo(@"  Codecs match: %@ (%@==%@, %@==%@)", codecsMatch ? @"YES" : @"NO", currentVideoCodec, targetVideoCodec, currentAudioCodec, targetAudioCodec);
+    RCTLogInfo(@"  Container matches: %@ (%@==%@)", containerMatches ? @"YES" : @"NO", inputContainer, targetContainer);
+    RCTLogInfo(@"  Video bitrate reasonable: %@ (%lld <= %lld)", videoBitrateReasonable ? @"YES" : @"NO", currentVideoBitrate, videoRecompressionThreshold);
+    RCTLogInfo(@"  Audio bitrate reasonable: %@ (%lld <= %lld)", audioBitrateReasonable ? @"YES" : @"NO", currentAudioBitrate, audioRecompressionThreshold);
+    
     // Decision logic
     NSString *action = @"recompress"; // Default action
     NSString *exportPreset = AVAssetExportPresetMediumQuality;
     
-    // 1. If already MP4 with H.264 and AAC, pass through
-    if ([inputContainer isEqualToString:@"mp4"] && 
-        [currentVideoCodec isEqualToString:targetVideoCodec] && 
-        [currentAudioCodec isEqualToString:targetAudioCodec]) {
+    // 1. Perfect case: everything matches and bitrates are reasonable
+    if (codecsMatch && containerMatches && videoBitrateReasonable && audioBitrateReasonable) {
         
         action = @"passthrough";
+        RCTLogInfo(@"Decision: PASSTHROUGH - Already optimal");
         
         // Just copy the file
         NSError *copyError;
@@ -257,18 +319,18 @@ RCT_EXPORT_METHOD(processVideo:(NSString *)inputPath
         return;
     }
     
-    // 2. If different container but same codecs (just rewrap)
-    if (![inputContainer isEqualToString:targetContainer] && 
-        [currentVideoCodec isEqualToString:targetVideoCodec] && 
-        [currentAudioCodec isEqualToString:targetAudioCodec]) {
+    // 2. Good codecs but wrong container or within rewrap threshold
+    else if (codecsMatch && videoBitrateReasonable && audioBitrateReasonable) {
         
         action = @"rewrap";
         exportPreset = AVAssetExportPresetPassthrough;
+        RCTLogInfo(@"Decision: REWRAP - Correct codecs, change container or minor optimization");
     }
     
-    // 3. If different codecs or other cases - recompress
+    // 3. High bitrates or wrong codecs - need full recompression
     else {
         action = @"recompress";
+        RCTLogInfo(@"Decision: RECOMPRESS - Bitrates too high or wrong codecs");
         
         // Choose preset based on settings
         if (settings[@"quality"]) {

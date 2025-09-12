@@ -1,6 +1,6 @@
 {
     "name": "react-native-video-recompression",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "description": "A React Native library for intelligent video processing with native performance. Supports video analysis, quality-preserving format conversion, and smart recompression with customizable settings.",
     "main": "lib/commonjs/index.js",
     "module": "lib/module/index.js",
@@ -60,14 +60,14 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/YOUR_USERNAME/react-native-video-recompression.git"
+        "url": "https://github.com/benacler/react-native-video-recompression.git"
     },
-    "author": "Your Name <your.email@example.com>",
+    "author": "Leo <leo@example.com>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/YOUR_USERNAME/react-native-video-recompression/issues"
+        "url": "https://github.com/benacler/react-native-video-recompression/issues"
     },
-    "homepage": "https://github.com/YOUR_USERNAME/react-native-video-recompression#readme",
+    "homepage": "https://github.com/benacler/react-native-video-recompression#readme",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },

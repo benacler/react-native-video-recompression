@@ -36,7 +36,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         try {
             val result = WritableNativeMap().apply {
                 putString("platform", "android")
-                putString("version", "0.9.1")
+                putString("version", "0.9.2")
                 putArray("capabilities", WritableNativeArray().apply {
                     pushString("video_analysis")
                     pushString("smart_compression")
@@ -84,8 +84,8 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 
                 // Analyze input and determine processing strategy
                 val inputContainer = getFileExtension(inputPath)
-                val currentVideoCodec = detectVideoCodecFromFile(inputPath)
-                val currentAudioCodec = detectAudioCodecFromFile(inputPath)
+                val currentVideoCodec = originalInfo.getString("videoCodec") ?: "unknown"
+                val currentAudioCodec = originalInfo.getString("audioCodec") ?: "unknown"
                 
                 // Get target settings with defaults
                 val targetVideoCodec = settings?.getString("videoCodec") ?: "h264"

@@ -26,7 +26,7 @@ RCT_EXPORT_METHOD(init:(RCTPromiseResolveBlock)resolve
         RCTLogInfo(@"VideoRecompression module initialized successfully on iOS");
         resolve(@{
             @"platform": @"ios",
-            @"version": @"0.9.2",
+            @"version": @"0.9.4",
             @"capabilities": @[@"video_analysis", @"smart_compression", @"codec_detection", @"container_rewrap", @"progress_callbacks"]
         });
     });

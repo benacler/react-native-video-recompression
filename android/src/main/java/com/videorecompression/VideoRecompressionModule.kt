@@ -1,6 +1,9 @@
 package com.videorecompression
 
-import com.facebook.react.bridge.*
+impo            val result = WritableNativeMap().apply {
+                putString("platform", "android")
+                putString("version", "0.9.4")
+                putArray("capabilities", WritableNativeArray().apply {om.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.*
 import android.media.MediaMetadataRetriever
@@ -36,7 +39,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         try {
             val result = WritableNativeMap().apply {
                 putString("platform", "android")
-                putString("version", "0.9.2")
+                putString("version", "0.9.3")
                 putArray("capabilities", WritableNativeArray().apply {
                     pushString("video_analysis")
                     pushString("smart_compression")

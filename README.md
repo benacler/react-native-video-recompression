@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/react-native-video-recompression.svg)](https://badge.fury.io/js/react-native-video-recompression)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-video-recompression.svg)](https://npmjs.org/package/react-native-video-recompression)
-[![CI](https://github.com/benacler/react-native-video-recompression/workflows/CI/badge.svg)](https://github.com/benacler/react-native-video-recompression/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A React Native library for **intelligent video processing** with native performance. Features **accurate bitrate analysis**, **smart MOV→MP4 rewrapping**, and **bitrate-aware compression decisions** optimized for mobile chat applications and media sharing.

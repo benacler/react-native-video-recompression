@@ -130,13 +130,6 @@ public class VideoRecompressionTest {
             Log.e("VideoRecompressionTest", "❌ Promise rejected: " + error);
         }
         
-        @Override
-        public void reject(String code, String message, Throwable throwable, WritableMap userInfo) {
-            rejected = true;
-            error = code + ": " + message;
-            Log.e("VideoRecompressionTest", "❌ Promise rejected: " + error, throwable);
-        }
-        
         public boolean isResolved() { return resolved; }
         public boolean isRejected() { return rejected; }
         public String getError() { return error; }

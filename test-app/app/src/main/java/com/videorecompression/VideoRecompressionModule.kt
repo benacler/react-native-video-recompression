@@ -36,7 +36,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         try {
             val result = WritableNativeMap().apply {
                 putString("platform", "android")
-                putString("version", "0.9.7")
+                putString("version", "0.9.6")
                 putArray("capabilities", WritableNativeArray().apply {
                     pushString("video_analysis")
                     pushString("smart_compression")
@@ -571,8 +571,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
     private fun getFileExtension(filePath: String): String {
         return filePath.substringAfterLast('.', "unknown").lowercase()
     }
-    
-    @Deprecated("onCatalystInstanceDestroy is deprecated")
+
     override fun onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy()
         scope.cancel()

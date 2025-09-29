@@ -410,6 +410,7 @@ EOF
     # Create build.gradle
     cat > app/build.gradle << 'EOF'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 34
@@ -443,6 +444,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.21'
     }
 }
 
@@ -526,11 +528,23 @@ build_and_deploy() {
     mkdir -p build/gen
     mkdir -p build/apk
     
-    # We'll create our simplified Java version directly instead of copying Kotlin files
-    echo "  Creating simplified VideoRecompression module for testing..."
+    # We'll use the actual Kotlin module instead of creating a simplified version
+    echo "  Using actual Kotlin VideoRecompression module for testing..."
     mkdir -p app/src/main/java/com/videorecompression
     
-    # Create a simplified Java version of VideoRecompressionModule
+    # Copy the actual Kotlin source files
+    echo "  Copying actual Kotlin module..."
+    cp -r "$PROJECT_ROOT/android/src/main/java/com/videorecompression/"* app/src/main/java/com/videorecompression/
+    
+    # Verify the files were copied
+    if [ ! -f "app/src/main/java/com/videorecompression/VideoRecompressionModule.kt" ]; then
+        echo -e "${RED}❌ Failed to copy Kotlin module files${NC}"
+        exit 1
+    fi
+    
+    echo "  ✅ Copied actual VideoRecompressionModule.kt for testing"
+    
+    # The actual Kotlin module is now copied, we'll compile it with kotlinc later
     cat > app/src/main/java/com/videorecompression/VideoRecompressionModule.java << 'EOF'
 package com.videorecompression;
 
@@ -849,20 +863,46 @@ public class Arguments {
 }
 EOF
 
-    # Compile all Java files
-    echo "  Compiling Java files..."
-    find app/src -name "*.java" > sources.txt
+    # Compile Kotlin and Java files
+    echo "  Compiling Kotlin and Java files..."
     
-    javac -cp "$PLATFORM_DIR/android.jar" \
-          -d build/classes \
-          @sources.txt
-    
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Java compilation failed${NC}"
+    # Check if kotlinc is available
+    if ! command -v kotlinc &> /dev/null; then
+        echo -e "${RED}❌ kotlinc not found. Please install Kotlin compiler${NC}"
+        echo "Install with: brew install kotlin (macOS) or download from https://kotlinlang.org/"
         exit 1
     fi
     
-    echo -e "${GREEN}✅ Java compilation successful${NC}"
+    # First compile Kotlin files
+    find app/src -name "*.kt" > kotlin_sources.txt
+    if [ -s kotlin_sources.txt ]; then
+        echo "  Compiling Kotlin files..."
+        kotlinc -cp "$PLATFORM_DIR/android.jar" \
+               -d build/classes \
+               @kotlin_sources.txt
+        
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Kotlin compilation failed${NC}"
+            echo "This would catch the syntax error in the real module!"
+            exit 1
+        fi
+        echo "  ✅ Kotlin compilation successful"
+    fi
+    
+    # Then compile Java files
+    find app/src -name "*.java" > java_sources.txt
+    if [ -s java_sources.txt ]; then
+        echo "  Compiling Java files..."
+        javac -cp "$PLATFORM_DIR/android.jar:build/classes" \
+              -d build/classes \
+              @java_sources.txt
+        
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Java compilation failed${NC}"
+            exit 1
+        fi
+        echo "  ✅ Java compilation successful"
+    fi
     
     # Create DEX file
     echo "  Creating DEX file..."

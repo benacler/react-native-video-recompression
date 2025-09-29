@@ -36,7 +36,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         try {
             val result = WritableNativeMap().apply {
                 putString("platform", "android")
-                putString("version", "0.9.8")
+                putString("version", "0.9.9")
                 putArray("capabilities", WritableNativeArray().apply {
                     pushString("video_analysis")
                     pushString("smart_compression")
@@ -547,24 +547,34 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
     
     private fun applyVideoSettings(format: MediaFormat, settings: ReadableMap) {
         // Apply video compression settings
-        settings.getInt("maxWidth").takeIf { it > 0 }?.let { 
-            format.setInteger(MediaFormat.KEY_WIDTH, it) 
+        if (settings.hasKey("maxWidth")) {
+            settings.getInt("maxWidth").takeIf { it > 0 }?.let { 
+                format.setInteger(MediaFormat.KEY_WIDTH, it) 
+            }
         }
-        settings.getInt("maxHeight").takeIf { it > 0 }?.let { 
-            format.setInteger(MediaFormat.KEY_HEIGHT, it) 
+        if (settings.hasKey("maxHeight")) {
+            settings.getInt("maxHeight").takeIf { it > 0 }?.let { 
+                format.setInteger(MediaFormat.KEY_HEIGHT, it) 
+            }
         }
-        settings.getInt("videoBitrate").takeIf { it > 0 }?.let { 
-            format.setInteger(MediaFormat.KEY_BIT_RATE, it) 
+        if (settings.hasKey("videoBitrate")) {
+            settings.getInt("videoBitrate").takeIf { it > 0 }?.let { 
+                format.setInteger(MediaFormat.KEY_BIT_RATE, it) 
+            }
         }
-        settings.getInt("frameRate").takeIf { it > 0 }?.let { 
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, it) 
+        if (settings.hasKey("frameRate")) {
+            settings.getInt("frameRate").takeIf { it > 0 }?.let { 
+                format.setInteger(MediaFormat.KEY_FRAME_RATE, it) 
+            }
         }
     }
     
     private fun applyAudioSettings(format: MediaFormat, settings: ReadableMap) {
         // Apply audio compression settings
-        settings.getInt("audioBitrate").takeIf { it > 0 }?.let { 
-            format.setInteger(MediaFormat.KEY_BIT_RATE, it) 
+        if (settings.hasKey("audioBitrate")) {
+            settings.getInt("audioBitrate").takeIf { it > 0 }?.let { 
+                format.setInteger(MediaFormat.KEY_BIT_RATE, it) 
+            }
         }
     }
     

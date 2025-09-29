@@ -1,6 +1,6 @@
 {
     "name": "react-native-video-recompression",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "description": "A React Native library for intelligent video processing with native performance. Supports video analysis, quality-preserving format conversion, and smart recompression with customizable settings.",
     "main": "lib/commonjs/index.js",
     "module": "lib/module/index.js",
@@ -20,7 +20,8 @@
         "!**/__fixtures__",
         "!**/__mocks__",
         "!lib/typescript/example",
-        "!android/src/main/java/com/videorecompression/VideoRecompressionPackage.spec.ts"
+        "!android/src/main/java/com/videorecompression/VideoRecompressionPackage.spec.ts",
+        "!android/src/main/java/com/videorecompression/*Test.java"
     ],
     "scripts": {
         "test": "jest",

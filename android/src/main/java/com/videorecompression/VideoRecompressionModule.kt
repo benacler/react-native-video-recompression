@@ -36,7 +36,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         try {
             val result = WritableNativeMap().apply {
                 putString("platform", "android")
-                putString("version", "0.9.7")
+                putString("version", "0.9.8")
                 putArray("capabilities", WritableNativeArray().apply {
                     pushString("video_analysis")
                     pushString("smart_compression")

@@ -79,6 +79,25 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
     ) {
         scope.launch {
             try {
+                // Input validation
+                val inputFile = File(inputPath)
+                if (!inputFile.exists()) {
+                    promise.reject("PROCESS_ERROR", "Input file does not exist: $inputPath")
+                    return@launch
+                }
+                
+                if (!inputFile.canRead()) {
+                    promise.reject("PROCESS_ERROR", "Cannot read input file: $inputPath")
+                    return@launch
+                }
+                
+                if (inputFile.length() == 0L) {
+                    promise.reject("PROCESS_ERROR", "Input file is empty: $inputPath")
+                    return@launch
+                }
+                
+                Log.d("VideoRecompression", "Starting video processing: $inputPath -> $outputPath")
+                
                 val startTime = System.currentTimeMillis()
                 val originalInfo = getVideoInfo(inputPath)
                 
@@ -113,17 +132,45 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 when (action) {
                     "passthrough" -> {
                         // Just copy the file - already in optimal format
-                        File(inputPath).copyTo(File(outputPath), overwrite = true)
+                        try {
+                            File(inputPath).copyTo(File(outputPath), overwrite = true)
+                            Log.d("VideoRecompression", "Passthrough copy completed successfully")
+                        } catch (e: Exception) {
+                            Log.e("VideoRecompression", "Failed to copy file during passthrough: ${e.message}", e)
+                            throw Exception("Failed to copy video file: ${e.message}", e)
+                        }
                     }
                     "rewrap" -> {
                         // Change container but keep codecs - use MediaMuxer
-                        rewrapVideo(inputPath, outputPath)
+                        try {
+                            Log.d("VideoRecompression", "Starting video rewrap process")
+                            rewrapVideo(inputPath, outputPath)
+                            Log.d("VideoRecompression", "Video rewrap completed successfully")
+                        } catch (e: Exception) {
+                            Log.e("VideoRecompression", "Failed to rewrap video: ${e.message}", e)
+                            throw Exception("Failed to rewrap video: ${e.message}", e)
+                        }
                     }
                     "recompress" -> {
                         // Full transcoding needed
-                        transcodeVideo(inputPath, outputPath, settings)
+                        try {
+                            Log.d("VideoRecompression", "Starting video transcoding process")
+                            transcodeVideo(inputPath, outputPath, settings)
+                            Log.d("VideoRecompression", "Video transcoding completed successfully")
+                        } catch (e: Exception) {
+                            Log.e("VideoRecompression", "Failed to transcode video: ${e.message}", e)
+                            throw Exception("Failed to transcode video: ${e.message}", e)
+                        }
                     }
                 }
+                
+                // Validate output file was created successfully
+                val outputFile = File(outputPath)
+                if (!outputFile.exists() || outputFile.length() == 0L) {
+                    throw Exception("Output file was not created or is empty: $outputPath")
+                }
+                
+                Log.d("VideoRecompression", "Video processing completed successfully. Output size: ${outputFile.length()} bytes")
                 
                 val finalInfo = getVideoInfo(outputPath)
                 val processingTime = System.currentTimeMillis() - startTime
@@ -336,12 +383,17 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
     private fun rewrapVideo(inputPath: String, outputPath: String) {
         val extractor = MediaExtractor()
         var muxer: MediaMuxer? = null
+        var muxerStarted = false
         
         try {
             extractor.setDataSource(inputPath)
             muxer = MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             
             val trackCount = extractor.trackCount
+            if (trackCount == 0) {
+                throw IllegalStateException("No tracks found in input video")
+            }
+            
             val trackIndexMap = mutableMapOf<Int, Int>()
             
             // Add all tracks to muxer
@@ -351,7 +403,9 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 trackIndexMap[i] = muxerTrackIndex
             }
             
+            // Only start muxer after all tracks are added successfully
             muxer.start()
+            muxerStarted = true
             
             // Copy data from all tracks
             for (i in 0 until trackCount) {
@@ -360,10 +414,30 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 extractor.unselectTrack(i)
             }
             
+        } catch (e: Exception) {
+            Log.e("VideoRecompression", "Error in rewrapVideo: ${e.message}", e)
+            throw e
         } finally {
-            extractor.release()
-            muxer?.stop()
-            muxer?.release()
+            try {
+                extractor.release()
+            } catch (e: Exception) {
+                Log.w("VideoRecompression", "Error releasing extractor: ${e.message}")
+            }
+            
+            // Only stop muxer if it was started
+            if (muxerStarted) {
+                try {
+                    muxer?.stop()
+                } catch (e: Exception) {
+                    Log.w("VideoRecompression", "Error stopping muxer: ${e.message}")
+                }
+            }
+            
+            try {
+                muxer?.release()
+            } catch (e: Exception) {
+                Log.w("VideoRecompression", "Error releasing muxer: ${e.message}")
+            }
         }
     }
     
@@ -391,6 +465,7 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
         
         val extractor = MediaExtractor()
         var muxer: MediaMuxer? = null
+        var muxerStarted = false
         
         try {
             extractor.setDataSource(inputPath)
@@ -408,6 +483,11 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                     mime.startsWith("video/") -> videoTrackIndex = i
                     mime.startsWith("audio/") -> audioTrackIndex = i
                 }
+            }
+            
+            // Ensure we have at least one track to process
+            if (videoTrackIndex == -1 && audioTrackIndex == -1) {
+                throw IllegalStateException("No video or audio tracks found in input file")
             }
             
             // For simplified transcoding, we'll use MediaMuxer to copy tracks
@@ -430,7 +510,9 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 trackIndexMap[audioTrackIndex] = muxerAudioIndex
             }
             
+            // Only start muxer after all tracks are added successfully
             muxer.start()
+            muxerStarted = true
             
             // Copy tracks (simplified - doesn't actually transcode)
             trackIndexMap.forEach { (extractorIndex, muxerIndex) ->
@@ -439,10 +521,30 @@ class VideoRecompressionModule(reactContext: ReactApplicationContext) : ReactCon
                 extractor.unselectTrack(extractorIndex)
             }
             
+        } catch (e: Exception) {
+            Log.e("VideoRecompression", "Error in transcodeVideo: ${e.message}", e)
+            throw e
         } finally {
-            extractor.release()
-            muxer?.stop()
-            muxer?.release()
+            try {
+                extractor.release()
+            } catch (e: Exception) {
+                Log.w("VideoRecompression", "Error releasing extractor: ${e.message}")
+            }
+            
+            // Only stop muxer if it was started
+            if (muxerStarted) {
+                try {
+                    muxer?.stop()
+                } catch (e: Exception) {
+                    Log.w("VideoRecompression", "Error stopping muxer: ${e.message}")
+                }
+            }
+            
+            try {
+                muxer?.release()
+            } catch (e: Exception) {
+                Log.w("VideoRecompression", "Error releasing muxer: ${e.message}")
+            }
         }
     }
     

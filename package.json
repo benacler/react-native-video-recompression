@@ -1,6 +1,6 @@
 {
     "name": "react-native-video-recompression",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "description": "A React Native library for intelligent video processing with native performance. Supports video analysis, quality-preserving format conversion, and smart recompression with customizable settings.",
     "main": "lib/commonjs/index.js",
     "module": "lib/module/index.js",
@@ -35,10 +35,7 @@
         "build:module": "tsc --project tsconfig.build.json --module esnext --outDir lib/module",
         "build:types": "tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir lib/typescript",
         "clean": "rimraf lib",
-        "create-test-videos": "./scripts/create-test-videos.sh",
-        "validate": "./scripts/validate-library.sh",
-        "pre-publish": "./scripts/pre-publish.sh",
-        "release": "semantic-release"
+        "create-test-videos": "./scripts/create-test-videos.sh"
     },
     "keywords": [
         "react-native",
